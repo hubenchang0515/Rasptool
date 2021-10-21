@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "cpumodel.h"
+#include "cpuusagewidget.h"
 
 class MainWindow : public QMainWindow
 {
@@ -13,7 +14,8 @@ public:
     ~MainWindow();
 
 private:
-    CpuWidget* m_cpuWidget;
+    CpuModel* m_cpuModel;
+    CpuUsageWidget* m_cpuUsageWidget;
 };
 
 #endif // MAINWINDOW_H
