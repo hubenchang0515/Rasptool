@@ -7,6 +7,7 @@
 #include <QtCharts/QChart>
 #include <QtCharts/QValueAxis>
 #include <QtCharts/QSplineSeries>
+#include <QtCharts/QScatterSeries>
 
 class CpuUsageWidget : public QWidget
 {
@@ -21,12 +22,10 @@ signals:
 public slots:
 
 private:
-    static constexpr const uint xCount = 100;
+    static constexpr const int xCount = 60;
 
     QtCharts::QChartView* m_view;
     QtCharts::QChart* m_chart;
-    QtCharts::QValueAxis* m_axisX;
-    QtCharts::QValueAxis* m_axisY;
     QList<QtCharts::QLineSeries*> m_seriesList;
     QList<QQueue<double>> m_data;
 };

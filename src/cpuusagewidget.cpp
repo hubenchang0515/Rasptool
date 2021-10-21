@@ -5,9 +5,7 @@
 CpuUsageWidget::CpuUsageWidget(QWidget *parent, int core) :
     QWidget(parent),
     m_view(new QtCharts::QChartView(this)),
-    m_chart(new QtCharts::QChart),
-    m_axisX(new QtCharts::QValueAxis(this)),
-    m_axisY(new QtCharts::QValueAxis(this))
+    m_chart(new QtCharts::QChart)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(m_view);
@@ -16,29 +14,37 @@ CpuUsageWidget::CpuUsageWidget(QWidget *parent, int core) :
     m_view->setChart(m_chart);
     m_chart->legend()->hide();
 
-    m_axisX->setRange(0, CpuUsageWidget::xCount);
-    m_axisY->setRange(0.0, 1.0);
-    m_axisX->setGridLineVisible(true);
-    m_axisY->setGridLineVisible(true);
-
     for (int i = 0; i < core; i++)
     {
         auto series = new QtCharts::QSplineSeries(this);
-        m_chart->addSeries(series);
-        m_chart->setAxisX(m_axisX, series);
-        m_chart->setAxisY(m_axisY, series);
+        series->setPointsVisible(true);
         m_seriesList.push_back(series);
+        m_chart->addSeries(series);
 
         QQueue<double> data;
-        for (uint i = 0; i <= CpuUsageWidget::xCount; i++)
+        for (int i = 0; i <= CpuUsageWidget::xCount; i++)
             data.enqueue(0);
         m_data.push_back(data);
+    }
+
+    m_chart->createDefaultAxes();
+    auto axisX = dynamic_cast<QtCharts::QValueAxis*>(m_chart->axisX());
+    auto axisY = dynamic_cast<QtCharts::QValueAxis*>(m_chart->axisY());
+
+    if (axisX != nullptr && axisY != nullptr)
+    {
+        axisX->setRange(0, CpuUsageWidget::xCount);
+        axisY->setRange(0.0, 1.0);
+        axisX->setGridLineVisible(true);
+        axisY->setGridLineVisible(true);
+        axisX->setLabelFormat(" ");
+        axisY->setLabelFormat(" ");
     }
 }
 
 QSize CpuUsageWidget::sizeHint() const
 {
-    return QSize{600, 400};
+    return QSize{320, 240};
 }
 
 void CpuUsageWidget::append(double usage, QList<double> subUsages)
@@ -50,7 +56,7 @@ void CpuUsageWidget::append(double usage, QList<double> subUsages)
         m_data[i].dequeue();
         m_data[i].enqueue(subUsages[i]);
         m_seriesList[i]->clear();
-        for (int x = 0; static_cast<uint>(x) <= CpuUsageWidget::xCount; x++)
+        for (int x = 0; x <= CpuUsageWidget::xCount; x++)
         {
             m_seriesList[i]->append(x, m_data[i][x]);
         }
